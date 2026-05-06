@@ -1,0 +1,21 @@
+# virtual environments
+venv/
+.env/
+.env.*
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Playwright / test artifacts (optional)
+playwright-report/
+test-results/
+venv/
+venv/

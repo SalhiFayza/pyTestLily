@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lily Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>🌿 Lily</h2>
+        <p>Aquaponics Assistant</p>
+
+        <ul>
+            <li class="active">💬 Chat</li>
+            <li>📊 Dashboard</li>
+            <li>💧 Sensors</li>
+            <li>📜 History</li>
+            <li>⚠️ Alerts</li>
+        </ul>
+
+        <div class="status-card">
+            <h4>System Status</h4>
+            <p class="ok">✔ All Systems Normal</p>
+        </div>
+    </div>
+
+    <!-- Chat Section -->
+    <div class="chat-section">
+
+        <div class="header">
+            <h2>Lily Assistant</h2>
+            <span id="time"></span>
+        </div>
+
+        <div id="messages"></div>
+
+        <div class="input-area">
+            <input id="input" placeholder="Type your message...">
+            <button onclick="send()">Send</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function send() {
+    let input = document.getElementById("input");
+    let message = input.value;
+
+    if (!message) return;
+
+    addMessage(message, "user");
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        addMessage(data.response, "bot");
+    });
+
+    input.value = "";
+}
+
+function getTime() {
+    let now = new Date();
+    return now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+
+function addMessage(text, sender) {
+    let container = document.createElement("div");
+    container.className = "message " + sender;
+
+    let avatar = document.createElement("div");
+    avatar.className = "avatar";
+
+    avatar.innerHTML = sender === "bot"
+        ? '<i class="fas fa-robot"></i>'
+        : '<i class="fas fa-user"></i>';
+
+    let bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    let content = document.createElement("div");
+    content.innerText = text;
+
+    let time = document.createElement("div");
+    time.className = "time";
+    time.innerText = getTime();
+
+    bubble.appendChild(content);
+    bubble.appendChild(time);
+
+    if (sender === "bot") {
+        container.appendChild(avatar);
+        container.appendChild(bubble);
+    } else {
+        container.appendChild(bubble);
+        container.appendChild(avatar);
+    }
+
+    document.getElementById("messages").appendChild(container);
+}
+document.getElementById("input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        send();
+    }
+});
+// live time
+setInterval(() => {
+    document.getElementById("time").innerText =
+        new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}, 1000);
+</script>
+
+</body>
+</html>
